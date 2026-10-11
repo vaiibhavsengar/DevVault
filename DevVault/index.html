@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevVault — Your Personal Developer Resource Vault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">DV</span>
+        <div>
+          <p class="brand-name">DevVault</p>
+          <p class="brand-tag">Developer resources</p>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <p class="nav-label">Views</p>
+        <button class="nav-item is-active" data-view="dashboard" type="button">
+          Dashboard
+        </button>
+        <button class="nav-item" data-view="resources" type="button">
+          All resources
+        </button>
+        <button class="nav-item" data-filter="favorites" type="button">
+          Favorites
+        </button>
+      </nav>
+
+      <nav class="nav" aria-label="Categories">
+        <p class="nav-label">Categories</p>
+        <button class="nav-item" data-filter="all" type="button">All</button>
+        <button class="nav-item" data-filter="AI" type="button">AI</button>
+        <button class="nav-item" data-filter="Web Development" type="button">Web Development</button>
+        <button class="nav-item" data-filter="GitHub" type="button">GitHub</button>
+        <button class="nav-item" data-filter="CSS" type="button">CSS</button>
+        <button class="nav-item" data-filter="JavaScript" type="button">JavaScript</button>
+        <button class="nav-item" data-filter="DevOps" type="button">DevOps</button>
+        <button class="nav-item" data-filter="Tools" type="button">Tools</button>
+        <button class="nav-item" data-filter="Other" type="button">Other</button>
+      </nav>
+
+      <div class="sidebar-actions">
+        <button class="btn btn-ghost" id="exportBtn" type="button">Export JSON</button>
+        <button class="btn btn-ghost" id="importBtn" type="button">Import JSON</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay" hidden></div>
+
+    <div class="main-wrap">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
+          <span aria-hidden="true">☰</span>
+        </button>
+        <label class="search" for="searchInput">
+          <span class="visually-hidden">Search resources</span>
+          <input id="searchInput" type="search" placeholder="Search title, description, category, or tags" autocomplete="off">
+        </label>
+        <button class="btn btn-primary" id="addBtn" type="button">Add resource</button>
+      </header>
+
+      <main class="content" id="content">
+        <section id="dashboardView" class="view" aria-labelledby="dashboardTitle">
+          <div class="page-head">
+            <div>
+              <h1 id="dashboardTitle">Dashboard</h1>
+              <p class="muted">Your personal developer resource vault</p>
+            </div>
+          </div>
+
+          <div class="stats" role="list">
+            <article class="stat-card" role="listitem">
+              <p class="stat-label">Total resources</p>
+              <p class="stat-value" id="statTotal">0</p>
+            </article>
+            <article class="stat-card" role="listitem">
+              <p class="stat-label">Favorites</p>
+              <p class="stat-value" id="statFavorites">0</p>
+            </article>
+            <article class="stat-card" role="listitem">
+              <p class="stat-label">Categories used</p>
+              <p class="stat-value" id="statCategories">0</p>
+            </article>
+          </div>
+
+          <div class="section-head">
+            <h2>Recently added</h2>
+          </div>
+          <div id="recentGrid" class="card-grid"></div>
+        </section>
+
+        <section id="resourcesView" class="view" hidden aria-labelledby="resourcesTitle">
+          <div class="page-head">
+            <div>
+              <h1 id="resourcesTitle">Resources</h1>
+              <p class="muted" id="filterHint">Showing all resources</p>
+            </div>
+          </div>
+          <div id="resourceGrid" class="card-grid"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal" id="resourceModal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="modalTitle">Add resource</h2>
+        <button class="icon-btn" id="closeModalBtn" type="button" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="resourceForm">
+        <input type="hidden" id="resourceId">
+
+        <label for="titleInput">Title</label>
+        <input id="titleInput" name="title" type="text" required maxlength="120" placeholder="MDN Web Docs">
+
+        <label for="urlInput">URL</label>
+        <input id="urlInput" name="url" type="url" required placeholder="https://developer.mozilla.org">
+
+        <label for="descriptionInput">Description</label>
+        <textarea id="descriptionInput" name="description" rows="3" maxlength="280" placeholder="A short note about why this is useful"></textarea>
+
+        <label for="categoryInput">Category</label>
+        <select id="categoryInput" name="category" required>
+          <option value="AI">AI</option>
+          <option value="Web Development">Web Development</option>
+          <option value="GitHub">GitHub</option>
+          <option value="CSS">CSS</option>
+          <option value="JavaScript">JavaScript</option>
+          <option value="DevOps">DevOps</option>
+          <option value="Tools">Tools</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="tagsInput">Tags <span class="optional">(optional, comma separated)</span></label>
+        <input id="tagsInput" name="tags" type="text" placeholder="docs, reference, frontend">
+
+        <label class="checkbox">
+          <input id="favoriteInput" name="favorite" type="checkbox">
+          <span>Mark as favorite</span>
+        </label>
+
+        <div class="modal-actions">
+          <button class="btn btn-ghost" type="button" id="cancelModalBtn">Cancel</button>
+          <button class="btn btn-primary" type="submit">Save resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmModal" hidden role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-card modal-card-sm">
+      <h2 id="confirmTitle">Delete resource?</h2>
+      <p class="muted" id="confirmText">This cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" id="cancelDeleteBtn">Cancel</button>
+        <button class="btn btn-danger" type="button" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
