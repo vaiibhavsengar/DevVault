@@ -47,7 +47,7 @@ DevVault/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/devvault.git
+git clone https://github.com/vaiibhavsengar/devvault.git
 ```
 
 ### 2. Open the project
